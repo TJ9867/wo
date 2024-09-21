@@ -74,3 +74,15 @@ def stdout_redirected(to=os.devnull, stdout=None):
 
 def merged_stderr_stdout():  # $ exec 2>&1
     return stdout_redirected(to=sys.stdout, stdout=sys.stderr)
+
+
+def write_output(logger, pretty_fmt, output_format, is_header, *args):
+    if output_format == "csv":
+        logger.info(",".join(args))
+    elif output_format == "md":
+        logger.info("| " + "\t|".join(args) + " |")
+        if is_header:
+            logger.info("|" + "|".join(["-" for _ in args]) + "|")
+
+    elif output_format == "text":
+        logger.info(pretty_fmt.format(*args))

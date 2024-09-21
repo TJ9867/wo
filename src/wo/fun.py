@@ -8,7 +8,8 @@ from pathlib import Path
 from logging import Logger
 from typing import List
 
-from . import stdout_redirected, merged_stderr_stdout, ASCII_COLORS
+from . import stdout_redirected, merged_stderr_stdout, ASCII_COLORS, write_output
+
 
 interesting_functions = {
     "exec-family": [
@@ -66,7 +67,7 @@ def parse_fun(parser):
         "-o",
         "--output-format",
         type=str,
-        choices=["text", "csv"],
+        choices=["text", "csv", "md"],
         default="text",
         help="Output format. text is nice for CLI and csv is easier for tracking large numbers of hits.",
     )
@@ -97,6 +98,17 @@ def process_fun(logger: Logger, args: argparse.Namespace):
     partial_fns = [fn.replace(",", "").strip() for fn in partial_fns if fn is not None]
     regex_fns = [fn.replace(",", "").strip() for fn in regex_fns if fn is not None]
 
+    if args.output_format in ["csv", "md"]:
+        write_output(
+            logger,
+            "{},{},{}",
+            args.output_format,
+            True,
+            "Binary Name",
+            "Function Name",
+            "Match Type",
+        )
+
     for dirent in args.directory:
         if not dirent.exists():
             logger.warn(f"No such directory {dirent}. Skipping...")
@@ -121,9 +133,17 @@ def process_exact_fns(logger, output_format, f, predefined_fns, bin_function_set
             logger.info(
                 f"{ASCII_COLORS['green']}{matching_fns}{ASCII_COLORS['reset']} in {f}"
             )
-        else:
+        elif output_format in ["csv", "md"]:
             for matching_fn in matching_fns:
-                logger.info(f"{f.name}, {matching_fn}, exact name match")
+                write_output(
+                    logger,
+                    "{}, {}, {}",
+                    output_format,
+                    False,
+                    f.name,
+                    matching_fn,
+                    "exact name match",
+                )
 
 
 def process_regex_fns(logger, output_format, f, partial_fns, bin_function_set):
@@ -143,8 +163,16 @@ def process_regex_fns(logger, output_format, f, partial_fns, bin_function_set):
                     logger.info(
                         f"{ASCII_COLORS['green']}{fn}{ASCII_COLORS['reset']} in {f}"
                     )
-                else:
-                    logger.info(f"{f.name}, {fn}, regex match")
+                elif output_format in ["csv", "md"]:
+                    write_output(
+                        logger,
+                        "{}, {}, {}",
+                        output_format,
+                        False,
+                        f.name,
+                        fn,
+                        "regex match",
+                    )
 
 
 def process_fun_directory(
@@ -160,7 +188,6 @@ def process_fun_directory(
         f"Processing directory {dirent} with fns:\n\t-{'\n\t-'.join(predefined_fns)}\n"
     )
 
-    logger.info(f"Binary Name, Function Name, Match Type")
     for f in dirent.rglob("*"):
         logger.debug(f"Found file {f}")
 

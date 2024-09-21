@@ -8,7 +8,7 @@ from pathlib import Path
 from logging import Logger
 from typing import List
 
-from . import stdout_redirected, merged_stderr_stdout, ASCII_COLORS
+from . import stdout_redirected, merged_stderr_stdout, ASCII_COLORS, write_output
 
 
 def parse_lslib(parser):
@@ -23,7 +23,7 @@ def parse_lslib(parser):
         "-o",
         "--output-format",
         type=str,
-        choices=["text", "csv"],
+        choices=["text", "csv", "md"],
         default="text",
         help="Output format. text is nice for CLI and csv is easier for tracking large numbers of hits.",
     )
@@ -38,6 +38,10 @@ def process_lslib(logger: Logger, args: argparse.Namespace):
             f"No such library directory {args.lib_dir}. Please double check the path provided."
         )
         return
+
+    if args.output_format in ["csv", "md"]:
+        write_output(logger, "{}", args.output_format, True, "Library")
+
     for binary in args.binary:
         if not binary.exists():
             logger.warn(f"No such binary {binary}. Skipping...")
@@ -97,6 +101,6 @@ def process_lslib_file(
 
     if output_format == "text":
         logger.info(", ".join(libraries))
-    elif output_format == "csv":
+    else:
         for library in libraries:
-            logger.info(library)
+            write_output(logger, "{}", output_format, False, library)

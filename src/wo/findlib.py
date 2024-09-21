@@ -8,7 +8,7 @@ from pathlib import Path
 from logging import Logger
 from typing import List
 
-from . import stdout_redirected, merged_stderr_stdout, ASCII_COLORS
+from . import stdout_redirected, merged_stderr_stdout, ASCII_COLORS, write_output
 from .lslib import recursive_find_libs
 
 
@@ -34,7 +34,7 @@ def parse_findlib(parser):
         "-o",
         "--output-format",
         type=str,
-        choices=["text", "csv"],
+        choices=["text", "csv", "md"],
         default="text",
         help="Output format. text is nice for CLI and csv is easier for tracking large numbers of hits.",
     )
@@ -49,7 +49,16 @@ def parse_findlib(parser):
 
 
 def process_findlib(logger: Logger, args: argparse.Namespace):
-    logger.info("Binary with Library, Matching Library")
+    if args.output_format in ["csv", "md"]:
+        write_output(
+            logger,
+            "{} {} {}",
+            args.output_format,
+            True,
+            "Binary with Library",
+            "Matching Library",
+        )
+
     for dirent in args.directory:
         if not dirent.exists():
             logger.warn(f"No such directory {dirent}. Skipping...")
@@ -75,7 +84,7 @@ def process_findlib_dir(
     elif type(library_name) is list:
         library_res = [re.compile(s) for s in library_name]
 
-    logger.warn(f"Using libraries {library_res}")
+    logger.debug(f"Using libraries {library_res}")
 
     for f in dirent.rglob("*/*"):
         if not f.is_file():
@@ -99,6 +108,9 @@ def process_findlib_dir(
                 if match:
                     if output_format == "text":
                         logger.info(f"Found file {f} with lib {library}")
-                    elif output_format == "csv":
-                        logger.info(f"{f}, {library}")
+                    elif output_format in ["csv", "md"]:
+                        # logger.info(f"{f}, {library}")
+                        write_output(
+                            logger, "{}, {}", output_format, False, str(f), library
+                        )
                 break
