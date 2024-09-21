@@ -16,7 +16,64 @@ pip install -e <this repo>
 This will install the `wo` command. 
 
 ## Usage
-See `wo -h` and the associated subcommand helps: `wo findlib -h`, `wo lslib -h`, `wo fun -h` for detailed help.
+See `wo -h` and the associated subcommand helps: `wo findlib -h`, `wo lslib -h`, `wo fun -h` for the most up-to-date help.
+
+```bash
+usage: wo fun [-h] [-l {exec-family,system-family,none,all,all}] [-f FUNCTION_NAME [FUNCTION_NAME ...]] [-p PARTIAL_FUNCTION_NAME [PARTIAL_FUNCTION_NAME ...]] [-r REGEX_FUNCTION_NAME [REGEX_FUNCTION_NAME ...]] [-o {text,csv,md}] directory [directory ...]
+
+Search a folder of binaries for 'interesting' functions
+
+positional arguments:
+  directory             Directory(s) to search
+
+options:
+  -h, --help            show this help message and exit
+  -l {exec-family,system-family,none,all,all}, --function-list {exec-family,system-family,none,all,all}
+                        List of functions to look for. Defaults to 'none'
+  -f FUNCTION_NAME [FUNCTION_NAME ...], --function-name FUNCTION_NAME [FUNCTION_NAME ...]
+                        Custom function name(s) to search for
+  -p PARTIAL_FUNCTION_NAME [PARTIAL_FUNCTION_NAME ...], --partial-function-name PARTIAL_FUNCTION_NAME [PARTIAL_FUNCTION_NAME ...]
+                        Custom partial function name(s) to search for
+  -r REGEX_FUNCTION_NAME [REGEX_FUNCTION_NAME ...], --regex-function-name REGEX_FUNCTION_NAME [REGEX_FUNCTION_NAME ...]
+                        Custom regex function name(s) to search for
+  -o {text,csv,md}, --output-format {text,csv,md}
+                        Output format. text is nice for CLI and csv is easier for tracking large numbers of hits.
+```
+
+```bash
+usage: wo findlib [-h] -l LIB_NAME [LIB_NAME ...] [-t {so,exe,any}] [-o {text,csv}] -d DIRECTORY [DIRECTORY ...]
+
+Recursively search for imports of a specific library
+
+options:
+  -h, --help            show this help message and exit
+  -l LIB_NAME [LIB_NAME ...], --lib-name LIB_NAME [LIB_NAME ...]
+                        Library name(s) to search for (regex)
+  -t {so,exe,any}, --filetype {so,exe,any}
+                        Restrict results to only specific file types (uses filepath heuristic as executables and libs are often both shared objects with entrypoints)
+  -o {text,csv}, --output-format {text,csv}
+                        Output format. text is nice for CLI and csv is easier for tracking large numbers of hits.
+  -d DIRECTORY [DIRECTORY ...], --directory DIRECTORY [DIRECTORY ...]
+                        Directory(s) to search
+```
+
+```bash
+usage: wo lslib [-h] -l LIB_DIR [-o {text,csv}] binary [binary ...]
+
+Recursively list the imported libraries of a binary
+
+positional arguments:
+  binary                Binary(s) to search through
+
+options:
+  -h, --help            show this help message and exit
+  -l LIB_DIR, --lib_dir LIB_DIR
+                        Directory to search for libraries in
+  -o {text,csv}, --output-format {text,csv}
+                        Output format. text is nice for CLI and csv is easier for tracking large numbers of hits.
+```
+
+
 
 ## Examples
 
