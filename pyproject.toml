@@ -1,13 +1,13 @@
 [project]
 name = "wo"
 dynamic = ["version"]
+dependencies = [
+"lief==0.15.1"
+]
 
 [build-system]
 requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
-
-[dependencies]
-lief = "0.15.1"
 
 [project.scripts]
 wo = "wo.wo:main_cli"
