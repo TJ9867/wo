@@ -184,9 +184,8 @@ def process_fun_directory(
     regex_fns: List[str],
     output_format: str,
 ):
-    logger.debug(
-        f"Processing directory {dirent} with fns:\n\t-{'\n\t-'.join(predefined_fns)}\n"
-    )
+    fns = "\n\t-".join(predefined_fns)
+    logger.debug(f"Processing directory {dirent} with fns:\n\t-{fns}\n")
 
     for f in dirent.rglob("*"):
         logger.debug(f"Found file {f}")
